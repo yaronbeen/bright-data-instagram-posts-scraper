@@ -67,8 +67,9 @@ class InstagramPostsScraper:
 
         payload: Dict[str, Any] = {
             "input": [{"url": url} for url in urls],
-            "limit_per_input": limit_per_input,
         }
+        if limit_per_input is not None:
+            payload["limit_per_input"] = limit_per_input
 
         params = {
             "dataset_id": self.DATASET_ID,
@@ -145,8 +146,9 @@ class InstagramPostsScraper:
 
         payload: Dict[str, Any] = {
             "input": input_list,
-            "limit_per_input": limit_per_input,
         }
+        if limit_per_input is not None:
+            payload["limit_per_input"] = limit_per_input
 
         params = {
             "dataset_id": self.DATASET_ID,
@@ -212,6 +214,7 @@ class InstagramPostsScraper:
             headers=headers,
             params=params,
             json=payload,
+            timeout=30,
         )
         response.raise_for_status()
         return response.json()
