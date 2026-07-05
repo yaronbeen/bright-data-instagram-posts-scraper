@@ -4,7 +4,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Bright Data](https://img.shields.io/badge/Powered%20by-Bright%20Data-orange.svg)](https://get.brightdata.com/1tndi4600b25)
 
-A Python wrapper for [Bright Data's Instagram Posts scraper API](https://get.brightdata.com/1tndi4600b25). Collect detailed post data by providing specific Instagram post URLs.
+A Python wrapper for Bright Data's Instagram Posts scraper API. Collect detailed post data by providing specific Instagram post URLs.
+
+> **All Instagram scrapers:** [Profile Scraper](https://github.com/yaronbeen/bright-data-instagram-profile-scraper) · [Profile Discovery](https://github.com/yaronbeen/bright-data-instagram-profile-discovery) · **Posts Scraper** · [Posts Discovery](https://github.com/yaronbeen/bright-data-instagram-posts-discovery) · [Reels Scraper](https://github.com/yaronbeen/bright-data-instagram-reels-scraper) · [Reels Discovery](https://github.com/yaronbeen/bright-data-instagram-reels-discovery) · [Reels (All) Discovery](https://github.com/yaronbeen/bright-data-instagram-reels-all-discovery) · [Comments Scraper](https://github.com/yaronbeen/bright-data-instagram-comments-scraper)
 
 ## Features
 
@@ -14,17 +16,24 @@ A Python wrapper for [Bright Data's Instagram Posts scraper API](https://get.bri
 - **Simple interface** - Clean Pythonic API with type hints
 - **Fast** - Average response time of ~1 second
 
+## Use Cases
+
+- Analyze which content types get the most engagement
+- Track hashtag performance across posts
+- Monitor competitor posting frequency and strategy
+- Collect media URLs for content research
+
 ## Prerequisites
 
 - Python 3.8 or higher
-- A Bright Data account with API access - [Sign up here](https://get.brightdata.com/1tndi4600b25)
+- A Bright Data account with API access (create an account at https://brightdata.com)
 
 ## Installation
 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/luminati-io/bright-data-instagram-posts-scraper.git
+git clone https://github.com/yaronbeen/bright-data-instagram-posts-scraper.git
 cd bright-data-instagram-posts-scraper
 ```
 
@@ -121,23 +130,58 @@ Each post record contains up to 40 fields. Key fields include:
 ```json
 {
     "url": "https://www.instagram.com/p/Cuf4s0MNqNr",
-    "user_posted": "natgeo",
-    "description": "A stunning view of the Northern Lights captured from Iceland.",
-    "hashtags": ["nature", "northernlights", "iceland", "travel"],
-    "num_comments": 342,
+    "user_posted": "thebucketlistfamily",
+    "description": "Morning light hitting the rice terraces just right. Moments like these remind us why we travel slow.",
+    "hashtags": ["slowtravel", "familytravel", "bali", "riceterraces"],
+    "num_comments": 87,
     "date_posted": "2024-01-15T18:30:00.000Z",
-    "likes": 125000,
+    "likes": 4832,
     "photos": [
-        "https://scontent.cdninstagram.com/v/photo1.jpg",
-        "https://scontent.cdninstagram.com/v/photo2.jpg"
+        "https://scontent.cdninstagram.com/v/t51.2885-15/photo1.jpg",
+        "https://scontent.cdninstagram.com/v/t51.2885-15/photo2.jpg"
     ],
     "videos": [],
-    "location": "Reykjavik, Iceland",
-    "tagged_profiles": ["photographer_jane"],
+    "location": "Ubud, Bali",
+    "tagged_profiles": ["visitbali"],
     "is_video": false,
     "is_sponsored": false
 }
 ```
+
+> Note: This is a representative example. Actual field values and available fields may vary.
+
+## Error Handling
+
+The scraper raises standard exceptions you can catch:
+
+```python
+import requests
+from instagram_posts_scraper import InstagramPostsScraper
+
+try:
+    scraper = InstagramPostsScraper()
+    results = scraper.collect_by_url("https://www.instagram.com/p/Cuf4s0MNqNr")
+except ValueError as e:
+    print(f"Configuration error: {e}")
+except requests.exceptions.HTTPError as e:
+    print(f"API error: {e}")
+except requests.exceptions.ConnectionError:
+    print("Could not connect to the API")
+```
+
+| Exception                          | Cause                                  |
+|------------------------------------|----------------------------------------|
+| `ValueError`                       | Missing API token.                     |
+| `requests.exceptions.HTTPError`    | API returned 4xx/5xx (auth, rate limit, etc.). |
+| `requests.exceptions.ConnectionError` | Network connectivity issue.         |
+| `requests.exceptions.ReadTimeout`  | Request took longer than 30 seconds.   |
+
+## Rate Limits
+
+- **Sync mode:** Results returned directly in the response. Best for small batches (1-10 inputs).
+- **Async mode:** For larger jobs, use the async API. See [Bright Data API docs](https://docs.brightdata.com/datasets/functions/introduction).
+- **No hard rate limit** on API calls, but performance varies with batch size.
+- **Pricing:** $0.0015 per record ($1.50 per 1,000 records).
 
 ## Running Tests
 
@@ -147,14 +191,15 @@ python -m pytest tests/ -v
 
 ## Why Bright Data?
 
-[Bright Data](https://get.brightdata.com/1tndi4600b25) handles the infrastructure for web data collection at scale:
+Instagram post data is rich but heavily protected. Bright Data gives you the full picture without the infrastructure headaches:
 
-- **Pre-built scrapers** - No need to build or maintain scraping logic
-- **Structured data** - Clean JSON output with 40+ fields per post
-- **High success rate** - Built-in proxy rotation and anti-blocking
-- **Scalable** - Handle thousands of requests with consistent performance
-- **Compliant** - Ethical data collection with full regulatory compliance
-- **Pay per result** - Only $0.0015 per record with no upfront costs
+- **40 fields per post** - Media URLs, location, tagged profiles, sponsorship status, and more in structured JSON
+- **Anti-scraping handled automatically** - Proxy rotation, fingerprinting, and rate limit management built in
+- **Batch multiple post URLs** in a single API call for efficient collection
+- **$0.0015/record** - Cheaper than building and maintaining your own scraping infrastructure
+- **High success rate** - Consistent data delivery even as Instagram changes its anti-bot measures
+
+For full API documentation, see the [Bright Data API Reference](https://docs.brightdata.com/datasets/functions/introduction).
 
 [Get started with Bright Data](https://get.brightdata.com/1tndi4600b25)
 
