@@ -4,13 +4,12 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 [![Bright Data](https://img.shields.io/badge/Powered%20by-Bright%20Data-orange.svg)](https://get.brightdata.com/1tndi4600b25)
 
-A Python wrapper for [Bright Data's Instagram Posts scraper API](https://get.brightdata.com/1tndi4600b25). Collect detailed post data by URL or discover posts from any public profile with date, type, and count filters.
+A Python wrapper for [Bright Data's Instagram Posts scraper API](https://get.brightdata.com/1tndi4600b25). Collect detailed post data by providing specific Instagram post URLs.
 
 ## Features
 
 - **Collect by URL** - Fetch full post data from one or more Instagram post URLs
-- **Discover by Profile** - Discover posts from any profile with date range, post type, and count filters
-- **Batch support** - Process multiple URLs or profiles in a single API call
+- **Batch support** - Process multiple URLs in a single API call
 - **40 data fields** - Likes, comments, hashtags, location, media URLs, tagged profiles, and more
 - **Simple interface** - Clean Pythonic API with type hints
 - **Fast** - Average response time of ~1 second
@@ -59,17 +58,6 @@ scraper = InstagramPostsScraper()
 results = scraper.collect_by_url("https://www.instagram.com/p/Cuf4s0MNqNr")
 for post in results:
     print(f"{post['user_posted']}: {post['likes']} likes")
-
-# Discover posts from a profile
-results = scraper.discover_by_profile(
-    "https://www.instagram.com/natgeo",
-    num_of_posts=10,
-    start_date="01-01-2025",
-    end_date="03-01-2025",
-    post_type="Post",
-)
-for post in results:
-    print(f"{post['url']} - {post['likes']} likes")
 ```
 
 ## API Reference
@@ -107,57 +95,6 @@ results = scraper.collect_by_url([
     "https://www.instagram.com/p/DP861NijuwE",
 ])
 ```
-
----
-
-### `discover_by_profile(profiles, limit_per_input=None, **kwargs)`
-
-Discover posts from Instagram profiles with optional filters. Supports three calling conventions.
-
-#### Option 1: URL string with keyword arguments
-
-| Parameter              | Type         | Required | Description                                     |
-|------------------------|--------------|----------|-------------------------------------------------|
-| `profiles`             | `str`        | Yes      | Instagram profile URL                           |
-| `num_of_posts`         | `int`        | No       | Number of posts to retrieve                     |
-| `start_date`           | `str`        | No       | Start date filter (`"MM-DD-YYYY"`)              |
-| `end_date`             | `str`        | No       | End date filter (`"MM-DD-YYYY"`)                |
-| `post_type`            | `str`        | No       | `"Post"` or `"Reel"`                            |
-| `posts_to_not_include` | `list[str]`  | No       | List of post IDs to exclude                     |
-| `limit_per_input`      | `int`        | No       | Max records per input profile                   |
-
-```python
-results = scraper.discover_by_profile(
-    "https://www.instagram.com/natgeo",
-    num_of_posts=10,
-    start_date="01-01-2025",
-    end_date="03-01-2025",
-    post_type="Post",
-)
-```
-
-#### Option 2: Single dict
-
-```python
-results = scraper.discover_by_profile({
-    "url": "https://www.instagram.com/natgeo",
-    "num_of_posts": 10,
-    "start_date": "01-01-2025",
-    "end_date": "03-01-2025",
-    "post_type": "Post",
-})
-```
-
-#### Option 3: List of dicts (batch)
-
-```python
-results = scraper.discover_by_profile([
-    {"url": "https://www.instagram.com/natgeo", "num_of_posts": 5},
-    {"url": "https://www.instagram.com/bbcnews", "num_of_posts": 3, "post_type": "Reel"},
-])
-```
-
-**Returns:** `list[dict]` - List of post data dictionaries.
 
 ## Output Fields
 

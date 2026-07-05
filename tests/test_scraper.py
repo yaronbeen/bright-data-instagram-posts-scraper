@@ -174,152 +174,6 @@ class TestCollectByUrl(unittest.TestCase):
         self.assertNotIn("limit_per_input", payload)
 
 
-class TestDiscoverByProfile(unittest.TestCase):
-    """Tests for discover_by_profile."""
-
-    def setUp(self):
-        self.scraper = InstagramPostsScraper(api_token="test_token")
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_simple_url_string(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        result = self.scraper.discover_by_profile(
-            "https://www.instagram.com/natgeo"
-        )
-
-        self.assertEqual(len(result), 1)
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertEqual(len(payload["input"]), 1)
-        self.assertEqual(
-            payload["input"][0]["url"],
-            "https://www.instagram.com/natgeo",
-        )
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_url_with_all_optional_params(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile(
-            "https://www.instagram.com/marcusfaberfdp",
-            num_of_posts=10,
-            start_date="01-01-2025",
-            end_date="03-01-2025",
-            post_type="Post",
-            posts_to_not_include=["abc123", "def456"],
-        )
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        entry = payload["input"][0]
-        self.assertEqual(entry["url"], "https://www.instagram.com/marcusfaberfdp")
-        self.assertEqual(entry["num_of_posts"], 10)
-        self.assertEqual(entry["start_date"], "01-01-2025")
-        self.assertEqual(entry["end_date"], "03-01-2025")
-        self.assertEqual(entry["post_type"], "Post")
-        self.assertEqual(entry["posts_to_not_include"], ["abc123", "def456"])
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_single_dict(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile(
-            {"url": "https://www.instagram.com/natgeo", "num_of_posts": 5}
-        )
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertEqual(len(payload["input"]), 1)
-        self.assertEqual(payload["input"][0]["num_of_posts"], 5)
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_batch_profiles_list_of_dicts(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST, SAMPLE_POST_2]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        profiles = [
-            {"url": "https://www.instagram.com/natgeo", "num_of_posts": 3},
-            {
-                "url": "https://www.instagram.com/bbcnews",
-                "num_of_posts": 5,
-                "post_type": "Reel",
-            },
-        ]
-        result = self.scraper.discover_by_profile(profiles)
-
-        self.assertEqual(len(result), 2)
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertEqual(len(payload["input"]), 2)
-        self.assertEqual(payload["input"][1]["post_type"], "Reel")
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_discover_query_params(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile("https://www.instagram.com/natgeo")
-
-        call_kwargs = mock_post.call_args
-        params = call_kwargs.kwargs.get("params") or call_kwargs[1]["params"]
-        self.assertEqual(params["dataset_id"], "gd_lk5ns7kz21pck8jpis")
-        self.assertEqual(params["type"], "discover_new")
-        self.assertEqual(params["discover_by"], "url")
-        self.assertEqual(params["include_errors"], "true")
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_discover_limit_per_input(self, mock_post):
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile(
-            "https://www.instagram.com/natgeo",
-            limit_per_input=10,
-        )
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertEqual(payload["limit_per_input"], 10)
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_optional_params_omitted_when_none(self, mock_post):
-        """When convenience kwargs are not provided, they should not appear."""
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile("https://www.instagram.com/natgeo")
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        entry = payload["input"][0]
-        self.assertIn("url", entry)
-        self.assertNotIn("num_of_posts", entry)
-        self.assertNotIn("start_date", entry)
-        self.assertNotIn("end_date", entry)
-        self.assertNotIn("post_type", entry)
-        self.assertNotIn("posts_to_not_include", entry)
-
-
 class TestMakeRequest(unittest.TestCase):
     """Tests for _make_request (auth headers, error handling)."""
 
@@ -375,8 +229,8 @@ class TestMakeRequest(unittest.TestCase):
         mock_post.return_value = mock_resp
 
         with self.assertRaises(requests.exceptions.HTTPError):
-            self.scraper.discover_by_profile(
-                "https://www.instagram.com/natgeo"
+            self.scraper.collect_by_url(
+                "https://www.instagram.com/p/Cuf4s0MNqNr"
             )
 
     @patch("instagram_posts_scraper.requests.post")
@@ -410,37 +264,6 @@ class TestLimitPerInputOmission(unittest.TestCase):
 
     def setUp(self):
         self.scraper = InstagramPostsScraper(api_token="test_token")
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_discover_default_limit_omitted(self, mock_post):
-        """limit_per_input should NOT appear in discover payload when not set."""
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile("https://www.instagram.com/natgeo")
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertNotIn("limit_per_input", payload)
-
-    @patch("instagram_posts_scraper.requests.post")
-    def test_discover_limit_included_when_set(self, mock_post):
-        """limit_per_input SHOULD appear in payload when explicitly set."""
-        mock_resp = MagicMock()
-        mock_resp.json.return_value = [SAMPLE_POST]
-        mock_resp.raise_for_status = MagicMock()
-        mock_post.return_value = mock_resp
-
-        self.scraper.discover_by_profile(
-            "https://www.instagram.com/natgeo",
-            limit_per_input=7,
-        )
-
-        call_kwargs = mock_post.call_args
-        payload = call_kwargs.kwargs.get("json") or call_kwargs[1]["json"]
-        self.assertEqual(payload["limit_per_input"], 7)
 
     @patch("instagram_posts_scraper.requests.post")
     def test_collect_limit_included_when_set(self, mock_post):
