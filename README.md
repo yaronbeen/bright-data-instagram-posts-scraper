@@ -147,7 +147,7 @@ python -m pytest tests/ -v
 
 ## Why Bright Data?
 
-[Bright Data](https://get.brightdata.com/1tndi4600b25) provides the most reliable infrastructure for web data collection:
+[Bright Data](https://get.brightdata.com/1tndi4600b25) handles the infrastructure for web data collection at scale:
 
 - **Pre-built scrapers** - No need to build or maintain scraping logic
 - **Structured data** - Clean JSON output with 40+ fields per post
