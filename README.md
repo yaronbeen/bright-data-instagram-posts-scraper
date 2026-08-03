@@ -203,6 +203,14 @@ For full API documentation, see the [Bright Data API Reference](https://docs.bri
 
 [Get started with Bright Data](https://get.brightdata.com/1tndi4600b25)
 
+## Need a custom scraper?
+
+If you need different post fields or a collection flow this scraper does not support, you can build your own with [Bright Data's Scraper Studio](https://brightdata.com/products/scraper-studio). Describe the Instagram post data you need in plain English, and Scraper Studio generates a production-ready scraper with your exact output schema. It includes self-healing, so when Instagram changes its markup, you describe the fix and push a patch in minutes instead of rewriting parsers.
+
+## Free tier
+
+Every Bright Data account comes with 5,000 free credits per month (roughly $7.50 in value). Credits reset on the first of each month, and no credit card is required to start. That is enough to pull a real batch of Instagram posts, inspect the 40 output fields, and evaluate whether this scraper fits your needs.
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
